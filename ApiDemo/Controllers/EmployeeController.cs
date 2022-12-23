@@ -23,7 +23,7 @@ namespace ApiDemo.Controllers
             return emp;
         }
 
-        // GET api/<EmployeeController>/5
+        // GET api/Employee/5
         [HttpGet("{id}")]
         public EmployeeModel GetAllEmployee(int id)
         {
@@ -38,19 +38,19 @@ namespace ApiDemo.Controllers
             return emp.FirstOrDefault(x => x.Id.Equals(id));
         }
 
-        // POST api/<EmployeeController>
+        // POST api/Employee
         [HttpPost]
         public void Post([FromBody] string value)
         {
         }
 
-        // PUT api/<EmployeeController>/5
+        // PUT api/Employee/5
         [HttpPut("{id}")]
         public void Put(int id, [FromBody] string value)
         {
         }
 
-        // DELETE api/<EmployeeController>/5
+        // DELETE api/Employee/5
         [HttpDelete("{id}")]
         public void Delete(int id)
         {
