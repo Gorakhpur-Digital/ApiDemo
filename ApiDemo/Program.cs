@@ -1,8 +1,16 @@
+using ApiDemo.DataAccess;
+using ApiDemo.Interfaces;
+using ApiDemo.Repositorys;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllers();
+
+builder.Services.AddScoped<IDapperORM, DapperORM>();
+builder.Services.AddScoped<IEmployee, EmployeeRepository>();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
