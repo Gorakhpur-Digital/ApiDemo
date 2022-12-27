@@ -15,6 +15,9 @@ builder.Services.AddScoped<IEmployee, EmployeeRepository>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+var policyName = "AllowAll";
+builder.Services.AddCors(policy => policy.AddPolicy(policyName, policy => policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -24,6 +27,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseCors(policyName);
 app.UseAuthorization();
 
 app.MapControllers();
