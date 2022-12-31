@@ -20,9 +20,12 @@ namespace ApiDemo.Controllers
 
         // GET: api/<EmployeeController>
         [HttpGet]
-        public IEnumerable<EmployeeModel> Get()
+        public IEnumerable<EmployeeListViewPageModel> Get()
         {
-            var employeeList = _employee.GetEmployee<EmployeeModel>();
+            var employeeList = _employee.GetEmployee<EmployeeListViewPageModel, DepartmentModel, EmployeeListViewPageModel>((List, department) => { 
+                List.DepartmentInfo = department;
+                return List;
+            });
             return employeeList;
         }
 

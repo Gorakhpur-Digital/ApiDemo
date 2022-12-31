@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>Bootstrap CRUD Data Table for Database with Modal Form</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto|Varela+Round">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="style.css">
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+
+</head>
+<body>
+<div class="container-xl">
+	<div class="table-responsive">
+        <div id="deleteMsg">
+			
+		</div>
+		<div class="table-wrapper">
+			<div class="table-title">
+				<div class="row">
+					<div class="col-sm-6">
+						<h2>Manage <b>Department</b></h2>
+					</div>
+					<div class="col-sm-6">
+						<a href="#addDepartmentModal" class="btn btn-success" data-toggle="modal"><i class="material-icons">&#xE147;</i> <span>Add New Department</span></a>
+					</div>
+				</div>
+			</div>
+			<table class="table table-striped table-hover">
+				<thead>
+					<thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>DepartmentName</th>
+                            <th>isActive</th>
+                            <th>CreateDate</th>
+                            <th>CreateBy</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+				</thead>
+				<tbody id="departmentList">
+                    
+                </tbody>
+			</table>
+		</div>
+	</div>        
+</div>
+<!-- Edit Modal HTML -->
+<div id="addDepartmentModal" class="modal fade">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<form>
+				<div class="modal-header">						
+					<h4 class="modal-title">Add Department</h4>
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				</div>
+				<div class="modal-body">					
+					<div class="form-group">
+						<label>Department Name</label>
+						<input type="text" id="departmentName" class="form-control">
+					</div>
+					<div class="form-group">
+						<label>Is Active</label>
+						<input type="checkbox" id="isActive" class="form-control">
+					</div>				
+				</div>
+				<div class="modal-footer">
+					<input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
+					<button type="button" class="btn btn-success" onclick="saveDepartment()">Add Department</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+<!-- Edit Modal HTML -->
+<div id="editDepartmentModal" class="modal fade">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<form>
+				<div class="modal-header">						
+					<h4 class="modal-title">Edit Department</h4>
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				</div>
+				<div class="modal-body">	
+                    <input type="hidden" id="departmentId"/>				
+					<div class="form-group">
+						<label>Department Name</label>
+						<input type="text" id="depName" class="form-control">
+					</div>
+					<div class="form-group">
+						<label>Is Active</label>
+						<input type="checkbox" id="active" class="form-control">
+					</div>			
+				</div>
+				<div class="modal-footer">
+					<input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
+					<button type="button" class="btn btn-success" onclick="updateDepartment()">Edit Department</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+<script>
+
+    let serverUrl = "http://localhost:5254/api/";
+    let departmentList = serverUrl + "department/";
+
+    getDepartmentList();
+
+    //get department list
+    function getDepartmentList() {
+        fetch(departmentList)
+            .then((res) => res.json())
+            .then((json) => {
+                let tableBoldy = document.getElementById("departmentList");
+                let rows = createRow(json);
+                tableBoldy.innerHTML = rows.join("");
+                $('.modal').modal('hide')
+            })
+            .catch((error) => console.log(error));
+    }
+
+    let createRow = (json) => {
+        return json.map(
+            (department) =>
+                `<tr id="${department.departmentId}">
+            <td>${department.departmentId}</td>
+            <td>${department.departmentName}</td>
+            <td>${department.isActive}</td>
+            <td>${department.createDate}</td>
+            <td>${department.createBy}</td>
+            <td>
+                <a href="#editDepartmentModal" class="edit" data-toggle="modal" onclick="getDepartmentById(${department.departmentId}, this)"><i class="material-icons" title="Edit">&#xE254;</i></a>
+                <a href="#" class="delete" onclick="deleteDepartment(${department.departmentId}, this)"><i class="material-icons" title="Delete">&#xE872;</i></a>
+            </td>
+        </tr>`
+        );
+    };
+
+    //delete department using javascript with api
+    function deleteDepartment(id, e) {
+        let delDepartment = departmentList + id;
+        fetch(delDepartment, {
+            method: "delete",
+        })
+            .then((res) => res.json())
+            .then((json) => {
+                e.closest("tr").remove();
+                deleteMsg(json);
+            });
+    }
+
+    function deleteMsg(msg) {
+        let deleteMsg = document.getElementById("deleteMsg");
+        let msgAlert = "";
+        if ((msg.status = "success")) {
+            msgAlert += `<div class="alert alert-success alert-dismissible fade show p-3" id="deleteMsg" role="alert">
+                        <strong>${msg.message}</strong>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                `;
+        }
+        deleteMsg.innerHTML = msgAlert;
+    }
+    //end delete
+    
+    
+    // get department 
+    let updateUrl = "http://localhost:5254/api/department/";
+
+    function getDepartmentById(id) {
+        let url = updateUrl + id;
+        fetch(url)
+        .then(res => res.json())
+        .then(json => {
+            document.getElementById("departmentId").value = json.departmentId;
+            document.getElementById("depName").value = json.departmentName;
+            document.getElementById("active").checked = json.isActive;
+        });
+    }
+    //end get department
+
+    // save data using javascript with api
+    let addUrl = "http://localhost:5254/api/department/";
+    function saveDepartment() {
+        
+        let data = {
+            departmentName : document.getElementById("departmentName").value,
+            isActive : document.getElementById("isActive").checked,
+        }
+
+        fetch(addUrl,{
+            method : "post",
+            headers: {
+            'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(res => res.json())
+        .then(json => {
+            getDepartmentList();
+        })
+        
+    }
+
+    //update data
+    function updateDepartment() {
+        let id = document.getElementById("departmentId").value;
+        let url = addUrl + id;
+        let data = {
+            departmentName : document.getElementById("depName").value,
+            isActive : document.getElementById("active").checked,
+        }
+
+        fetch(url,{
+            method : "put",
+            headers: {
+            'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(res => res.json())
+        .then(json => {
+            getDepartmentList();
+        })
+    }
+
+</script>
+
+</body>
+</html>

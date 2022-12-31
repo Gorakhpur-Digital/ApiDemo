@@ -62,5 +62,13 @@ namespace ApiDemo.Repositorys
 
             return _dapper.ReturnList<Response, dynamic>("Employee_Delete", param).FirstOrDefault() ?? new Response();
         }
+
+        public IEnumerable<TResult> GetEmployee<TFirst, TSecond, TResult>(Func<TFirst, TSecond, TResult> map, EmployeeFilterModel filters = null)
+        {
+            if (filters == null)
+                filters = new EmployeeFilterModel();
+
+            return _dapper.ReturnList<TFirst, TSecond, TResult, dynamic>("Employee_List_Mapping", map, filters);
+        }
     }
 }

@@ -10,6 +10,7 @@ builder.Services.AddControllers();
 
 builder.Services.AddScoped<IDapperORM, DapperORM>();
 builder.Services.AddScoped<IEmployee, EmployeeRepository>();
+builder.Services.AddScoped<IDepartment, DepartmentRepository>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
